@@ -89,6 +89,9 @@ class GalleryActivity : AppCompatActivity() {
     }
 
     private fun penjarImatge(){
-        transferUtility.upload( "kammerat", "prova1.jpg", fileToUpload);
+        println("HOLAAAA")
+        transferUtility.upload( "kammerat", "prova1.jpg", fileToUpload)
     }
+
+
 }
