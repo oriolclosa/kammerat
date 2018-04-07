@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 
 import android.Manifest.permission.READ_CONTACTS
+import android.content.Intent
 
 import kotlinx.android.synthetic.main.activity_login.*
 import java.sql.DriverManager
@@ -238,6 +239,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         val IS_PRIMARY = 1
     }
 
+    private fun obrirGaleria(){
+        val intent = Intent(this, GalleryActivity::class.java)
+        startActivity(intent)
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -245,54 +251,27 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
-            // TODO: attempt authentication against a network service.
-
-            /*Class.forName("org.postgresql.Driver")
-            var connection: Connection? = null
-            connection = DriverManager.getConnection(
-                    "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com", "root", "2018CopeRDS!")
-            connection!!.close()*/
-            println("HOLA1")
+            var correcte = false
             try {
                 Class.forName("org.postgresql.Driver")
-                println("HOLA2")
-                // "jdbc:postgresql://IP:PUERTO/DB", "USER", "PASSWORD");
-                // Si estás utilizando el emulador de android y tenes el PostgreSQL en tu misma PC no utilizar 127.0.0.1 o localhost como IP, utilizar 10.0.2.2
                 val conn = DriverManager.getConnection(
                         "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-                //En el stsql se puede agregar cualquier consulta SQL deseada.
-                val stsql = "Select version()"
-                println("HOLA3")
+                val stsql = "SELECT id FROM users WHERE (id = '$mEmail') and (pass = md5('$mPassword'));"
                 val st = conn.createStatement()
                 val rs = st.executeQuery(stsql)
                 rs.next()
-                println("HOLA4")
-                println(rs.getString(1))
+                val resultat = rs.getString(1)
+                if(resultat == mEmail){
+                    correcte = true
+                }
                 conn.close()
             } catch (se: SQLException) {
-                println("oops! No se puede conectar. Error: " + se.toString())
+                println("SQL ERROR: " + se.toString())
             } catch (e: ClassNotFoundException) {
-                println("oops! No se encuentra la clase. Error: " + e.message)
+                println("SQL CLASS ERROR: " + e.message)
             }
 
-
-            /*try {
-                // Simulate network access.
-                println("HOLA1")
-                Thread.sleep(2000)
-                println("HOLA2")
-            } catch (e: InterruptedException) {
-                return false
-            }*/
-
-            return DUMMY_CREDENTIALS
-                    .map { it.split(":") }
-                    .firstOrNull { it[0] == mEmail }
-                    ?.let {
-                        // Account exists, return true if the password matches.
-                        it[1] == mPassword
-                    }
-                    ?: true
+            return correcte
         }
 
         override fun onPostExecute(success: Boolean?) {
@@ -300,7 +279,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
-                finish()
+                obrirGaleria()
             } else {
                 password.error = getString(R.string.error_incorrect_password)
                 password.requestFocus()
@@ -319,11 +298,5 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
          * Id to identity READ_CONTACTS permission request.
          */
         private val REQUEST_READ_CONTACTS = 0
-
-        /**
-         * A dummy authentication store containing known user names and passwords.
-         * TODO: remove after connecting to a real authentication system.
-         */
-        private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
     }
 }
