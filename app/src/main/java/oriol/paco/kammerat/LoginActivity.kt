@@ -21,10 +21,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
-import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
 
 import kotlinx.android.synthetic.main.activity_login.*
+import java.sql.DriverManager
+import java.sql.SQLException
+import java.util.*
+import java.sql.*;
 
 /**
  * A login screen that offers login via email/password.
@@ -110,8 +113,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         var cancel = false
         var focusView: View? = null
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
+        // Check for a valid password.
+        if (!isPasswordValid(passwordStr)) {
             password.error = getString(R.string.error_invalid_password)
             focusView = password
             cancel = true
@@ -244,12 +247,43 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
+            /*Class.forName("org.postgresql.Driver")
+            var connection: Connection? = null
+            connection = DriverManager.getConnection(
+                    "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com", "root", "2018CopeRDS!")
+            connection!!.close()*/
+            println("HOLA1")
             try {
+                Class.forName("org.postgresql.Driver")
+                println("HOLA2")
+                // "jdbc:postgresql://IP:PUERTO/DB", "USER", "PASSWORD");
+                // Si estás utilizando el emulador de android y tenes el PostgreSQL en tu misma PC no utilizar 127.0.0.1 o localhost como IP, utilizar 10.0.2.2
+                val conn = DriverManager.getConnection(
+                        "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+                //En el stsql se puede agregar cualquier consulta SQL deseada.
+                val stsql = "Select version()"
+                println("HOLA3")
+                val st = conn.createStatement()
+                val rs = st.executeQuery(stsql)
+                rs.next()
+                println("HOLA4")
+                println(rs.getString(1))
+                conn.close()
+            } catch (se: SQLException) {
+                println("oops! No se puede conectar. Error: " + se.toString())
+            } catch (e: ClassNotFoundException) {
+                println("oops! No se encuentra la clase. Error: " + e.message)
+            }
+
+
+            /*try {
                 // Simulate network access.
+                println("HOLA1")
                 Thread.sleep(2000)
+                println("HOLA2")
             } catch (e: InterruptedException) {
                 return false
-            }
+            }*/
 
             return DUMMY_CREDENTIALS
                     .map { it.split(":") }
