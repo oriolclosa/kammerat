@@ -26,9 +26,20 @@
             android:layout_marginBottom="16dp"
             android:text="Pick image" />
 
+        <Button
+            android:id="@+id/sendImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Send image" />
+
         <ImageView
             android:id="@+id/imagePicked"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
