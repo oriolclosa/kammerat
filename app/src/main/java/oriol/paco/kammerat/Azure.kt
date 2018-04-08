@@ -8,15 +8,13 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.regex.Pattern
 
-
 class Azure {
-    private val subscriptionKey = "6df4e65191374f5596a29b8dfc759b16"
     private val endpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect"
 
     fun send(uri: String) {
         FuelManager.instance.baseHeaders = mapOf(
                 "Content-Type" to "application/octet-stream",
-                "Ocp-Apim-Subscription-Key" to subscriptionKey
+                "Ocp-Apim-Subscription-Key" to Constants.KEY
         )
 
         FuelManager.instance.baseParams = listOf(
