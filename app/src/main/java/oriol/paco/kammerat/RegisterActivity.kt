@@ -150,7 +150,5 @@ class RegisterActivity : AppCompatActivity() {
             println("SQL CLASS ERROR: " + e.message)
         }
 
-       val intent = Intent(this, LoginActivity::class.java)
-       startActivity(intent)
     }
 }

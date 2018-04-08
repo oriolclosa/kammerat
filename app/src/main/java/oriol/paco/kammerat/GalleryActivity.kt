@@ -57,22 +57,22 @@ class GalleryActivity : AppCompatActivity() {
         correu = intent.getStringExtra("correu")
         faceid = intent.getStringExtra("faceid")
 
-        temporitzador()
+        //temporitzador()
 
         pickImage.setOnClickListener { mostrarImatges() }
         sendImage.setOnClickListener { obtenirIDs() }
         fetchImages.setOnClickListener{ obtenirImatges() }
     }
 
-    private fun temporitzador() {
+    /*private fun temporitzador() {
         val myTimer = Timer()
         myTimer.schedule(object : TimerTask() {
             override fun run() {
-                println("HOLITA")
+                obtenirImatges()
             }
 
         }, 0, 5000)
-    }
+    }*/
 
     private fun mostrarImatges(){
         val pickPhoto = Intent(Intent.ACTION_PICK,
@@ -171,7 +171,7 @@ class GalleryActivity : AppCompatActivity() {
                 .s3Client(s3Client)
                 .build()
 
-        val fitxer = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+"test.jpg")
+        val fitxer = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+path)
 
         val downloadObserver = transferUtility.download("testoriol", path, fitxer)
 
