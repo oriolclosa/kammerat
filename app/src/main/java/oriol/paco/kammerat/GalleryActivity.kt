@@ -75,6 +75,10 @@ class GalleryActivity : AppCompatActivity() {
         return result
     }
 
+    private fun ferMatch(list: ArrayList<String>){
+        println(list.toString())
+    }
+
     private fun penjarImatge(){
         println("HOLAAAA")
 
