@@ -91,7 +91,7 @@ class GalleryActivity : AppCompatActivity() {
     }
 
 
-    private fun penjarImatge(list: ArrayList<String>){
+    fun penjarImatge(list: ArrayList<String>){
         val credentialsProvider = BasicAWSCredentials("AKIAI3HUO3V33FAMWBSQ", "qvmkUQEqKkCTkVzs1tKHFzu5qezFMn4FcxfrwGe2")
 
         /*val credentialsProvider = CognitoCachingCredentialsProvider(
@@ -107,28 +107,34 @@ class GalleryActivity : AppCompatActivity() {
                 .s3Client(s3Client)
                 .build()
 
-        val uploadObserver = transferUtility.upload("testoriol", correu + "/" + fileToUpload.name, fileToUpload)
+        val iterator = list.iterator()
+        if(iterator.hasNext()) {
+            iterator.next()
+        }
+        iterator.forEach {
+            val uploadObserver = transferUtility.upload("testoriol", it + "/" + fileToUpload.name, fileToUpload)
 
-        uploadObserver.setTransferListener(object : TransferListener {
+            uploadObserver.setTransferListener(object : TransferListener {
 
-            override fun onStateChanged(id: Int, state: TransferState) {
-                if (TransferState.COMPLETED == state) {
-                    Toast.makeText(applicationContext, "Image sent!", Toast.LENGTH_SHORT).show()
+                override fun onStateChanged(id: Int, state: TransferState) {
+                    if (TransferState.COMPLETED == state) {
+                        Toast.makeText(applicationContext, "Image sent!", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
 
-            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
-                val percentDone = percentDonef.toInt()
+                override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                    val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
+                    val percentDone = percentDonef.toInt()
 
-                println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
-            }
+                    println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
+                }
 
-            override fun onError(id: Int, ex: Exception) {
-                ex.printStackTrace()
-            }
+                override fun onError(id: Int, ex: Exception) {
+                    ex.printStackTrace()
+                }
 
-        })
+            })
+        }
     }
 
 
