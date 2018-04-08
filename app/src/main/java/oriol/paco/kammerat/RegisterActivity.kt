@@ -14,9 +14,9 @@ import java.sql.SQLException
 class RegisterActivity : AppCompatActivity() {
 
     lateinit var fileToUpload: String
-    lateinit var correuAct: String
-    lateinit var passAct: String
-    lateinit var nameAct: String
+     var correuAct: String? = null
+    var passAct: String? = null
+     var nameAct: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +70,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     fun crearPersona(){
-        AltaPersona().altaPersona(fileToUpload, correuAct)
+        AltaPersona().altaPersona(fileToUpload, correuAct!!)
     }
 
     fun ferAlta(persona: String){

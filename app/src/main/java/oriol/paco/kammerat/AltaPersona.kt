@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 class AltaPersona {
     private val endpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + Constants.GROUP_ID + "/persons"
 
-    fun altaPersona(uriBase: String, correuP: String) {
+    fun altaPersona(uriBase: String, correuP: String, pass : String, nom : String) {
         FuelManager.instance.baseHeaders = mapOf(
                 "Content-Type" to "application/json",
                 "Ocp-Apim-Subscription-Key" to Constants.KEY
@@ -28,7 +28,7 @@ class AltaPersona {
                     val m = p.matcher(data)
                     m.find()
                     val personID = m.group().toString()
-                    RegisterActivity().ferAlta(personID)
+                    RegisterActivity().ferAlta(personID, correuP, pass, nom)
                     AfegirFoto().afegirFoto(uriBase, personID)
                 }
             }
