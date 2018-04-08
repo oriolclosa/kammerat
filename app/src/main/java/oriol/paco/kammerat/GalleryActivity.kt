@@ -6,47 +6,34 @@ import android.database.Cursor
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.GridView
 import kotlinx.android.synthetic.main.activity_gallery.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.v4.app.ActivityCompat
-import android.widget.SimpleAdapter
+import android.widget.*
+import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver
+import com.amazonaws.mobile.client.AWSMobileClient
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
-import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3Client
 import org.postgresql.core.Utils
 import java.io.File
+import java.lang.Thread.sleep
+
+
 
 class GalleryActivity : AppCompatActivity() {
     lateinit var fileToUpload:File
-    lateinit var s3:AmazonS3
-    lateinit var transferUtility:TransferUtility
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
-
-        val credentialsProvider = CognitoCachingCredentialsProvider(applicationContext, "eu-west-1:aff89198-776e-4e35-86f0-d2f7228d0b4b", Regions.EU_WEST_1)
-        s3 = AmazonS3Client(credentialsProvider)
-        s3.setRegion(Region.getRegion(Regions.EU_WEST_1))
-        transferUtility = TransferUtility(s3, applicationContext)
-
-        var permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            val permisos = listOf<String>(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            ActivityCompat.requestPermissions( this, permisos.toTypedArray(), 1)
-        }
 
         pickImage.setOnClickListener { mostrarImatges() }
         sendImage.setOnClickListener { penjarImatge() }
@@ -90,7 +77,44 @@ class GalleryActivity : AppCompatActivity() {
 
     private fun penjarImatge(){
         println("HOLAAAA")
-        transferUtility.upload( "kammerat", "prova1.jpg", fileToUpload)
+
+        val credentialsProvider = BasicAWSCredentials("AKIAI3HUO3V33FAMWBSQ", "qvmkUQEqKkCTkVzs1tKHFzu5qezFMn4FcxfrwGe2")
+
+        /*val credentialsProvider = CognitoCachingCredentialsProvider(
+                applicationContext,
+                "eu-west-1:44527e3a-2bfa-4d2b-94b1-b6654dff4ebd", // Identity Pool ID
+                Regions.EU_WEST_1 // Region
+        )*/
+
+        val s3Client = AmazonS3Client(credentialsProvider)
+        val transferUtility = TransferUtility.builder()
+                .context(applicationContext)
+                .awsConfiguration(AWSMobileClient.getInstance().configuration)
+                .s3Client(s3Client)
+                .build()
+
+        val uploadObserver = transferUtility.upload("testoriol", "testupload/" + fileToUpload.name, fileToUpload)
+
+        uploadObserver.setTransferListener(object : TransferListener {
+
+            override fun onStateChanged(id: Int, state: TransferState) {
+                if (TransferState.COMPLETED == state) {
+                    Toast.makeText(applicationContext, "Upload Completed!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
+                val percentDone = percentDonef.toInt()
+
+                println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
+            }
+
+            override fun onError(id: Int, ex: Exception) {
+                ex.printStackTrace()
+            }
+
+        })
     }
 
 
