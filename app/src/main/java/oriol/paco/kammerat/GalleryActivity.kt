@@ -51,11 +51,13 @@ class GalleryActivity : AppCompatActivity() {
             0 -> if (resultCode == Activity.RESULT_OK) {
                 val selectedImage = imageReturnedIntent.data
                 imagePicked.setImageURI(selectedImage)
+                Azure().send(getRealPathFromURI(selectedImage))
                 fileToUpload = File(getRealPathFromURI(selectedImage))
             }
             1 -> if (resultCode == Activity.RESULT_OK) {
                 val selectedImage = imageReturnedIntent.data
                 imagePicked.setImageURI(selectedImage)
+                Azure().send(getRealPathFromURI(selectedImage))
                 fileToUpload = File(getRealPathFromURI(selectedImage))
             }
         }
@@ -75,7 +77,7 @@ class GalleryActivity : AppCompatActivity() {
         return result
     }
 
-    private fun ferMatch(list: ArrayList<String>){
+    fun ferMatch(list: ArrayList<String>){
         println(list.toString())
     }
 
