@@ -58,6 +58,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         //obrirGaleria()
     }
 
+
     private fun populateAutoComplete() {
         if (!mayRequestContacts()) {
             return

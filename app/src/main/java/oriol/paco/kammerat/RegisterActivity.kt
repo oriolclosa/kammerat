@@ -92,8 +92,8 @@ class RegisterActivity : AppCompatActivity() {
             println("SQL CLASS ERROR: " + e.message)
         }
 
-       // val intent = Intent(this, GalleryActivity::class.java)
-       // intent.putExtra("correu", correuAct)
-       // startActivity(intent)
+       val intent = Intent(this, GalleryActivity::class.java)
+       intent.putExtra("correu", correuAct)
+       startActivity(intent)
     }
 }

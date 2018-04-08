@@ -25,7 +25,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import org.postgresql.core.Utils
 import java.io.File
 import java.lang.Thread.sleep
-
+import java.util.*
 
 
 class GalleryActivity : AppCompatActivity() {
@@ -40,8 +40,20 @@ class GalleryActivity : AppCompatActivity() {
 
         correu = intent.getStringExtra("correu")
 
+        temporitzador()
+
         pickImage.setOnClickListener { mostrarImatges() }
         sendImage.setOnClickListener { obtenirIDs() }
+    }
+
+    private fun temporitzador() {
+        val myTimer = Timer()
+        myTimer.schedule(object : TimerTask() {
+            override fun run() {
+                println("holita")
+            }
+
+        }, 0, 1000)
     }
 
     private fun mostrarImatges(){

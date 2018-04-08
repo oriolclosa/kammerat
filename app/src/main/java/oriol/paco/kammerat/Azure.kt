@@ -20,9 +20,7 @@ class Azure {
         FuelManager.instance.baseParams = listOf(
                 "returnFaceId" to "true",
                 "returnFaceRectangle" to "false",
-                "returnFaceLandmarks" to "true",
-                "returnFaceAttributes" to "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise"
-        )
+                "returnFaceLandmarks" to "true")
         val file = File(uri)
         val size = file.length()
         val bytes = ByteArray(size.toInt())
@@ -56,6 +54,7 @@ class Azure {
                         val x : StringBuilder = StringBuilder(item)
                         x.deleteCharAt(0)
                         x.deleteCharAt(x.length - 1)
+
                         llista.add(x.toString())
                     }
                     enviarListaAGallery(llista);
