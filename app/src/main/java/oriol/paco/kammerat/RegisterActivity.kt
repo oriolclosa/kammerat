@@ -71,7 +71,7 @@ class RegisterActivity : AppCompatActivity() {
             Class.forName("org.postgresql.Driver")
             val conn = DriverManager.getConnection(
                     "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('${passwordReg.text.toString()}'), ${nameReg.text.toString()}, '$persona');"
+            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('${passwordReg.text.toString()}'), '${nameReg.text.toString()}', '$persona');"
             val st = conn.createStatement()
             val rs = st.executeQuery(stsql)
             rs.next()
