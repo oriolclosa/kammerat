@@ -6,10 +6,8 @@ import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import kotlinx.android.synthetic.main.activity_gallery.*
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
-import java.io.File
 import java.sql.DriverManager
 import java.sql.SQLException
 
@@ -17,12 +15,14 @@ class RegisterActivity : AppCompatActivity() {
 
     lateinit var fileToUpload: String
     lateinit var correuAct: String
+    lateinit var passAct: String
+    lateinit var nameAct: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        submitButton.setOnClickListener { crearPersona(fileToUpload) }
+        submitButton.setOnClickListener { setAndAlta() }
         takeButton.setOnClickListener { mostrarImatges() }
     }
 
@@ -60,18 +60,29 @@ class RegisterActivity : AppCompatActivity() {
         return result
     }
 
-    fun crearPersona(imatge: String){
+    fun setAndAlta(){
+        nameRegister.error = null
+        passwordRegister.error = null
         correuAct = emailRegister.text.toString()
-        AltaPersona().altaPersona(imatge, correuAct)
+        passAct = nameRegister.text.toString()
+        nameAct = passwordRegister.text.toString()
+        crearPersona()
+    }
+
+    fun crearPersona(){
+        AltaPersona().altaPersona(fileToUpload, correuAct)
     }
 
     fun ferAlta(persona: String){
         println("DONO D'ALTA: " + persona)
+        println("A: " + correuAct)
+        println("B: " + passAct)
+        println("C: " + nameAct)
         try {
             Class.forName("org.postgresql.Driver")
             val conn = DriverManager.getConnection(
                     "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('${passwordReg.text.toString()}'), '${nameReg.text.toString()}', '$persona');"
+            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('$passAct'), '$nameAct', '$persona');"
             val st = conn.createStatement()
             st.executeQuery(stsql)
             conn.close()
