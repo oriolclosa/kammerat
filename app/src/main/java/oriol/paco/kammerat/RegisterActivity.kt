@@ -112,7 +112,7 @@ class RegisterActivity : AppCompatActivity() {
             // form field with an error.
             focusView?.requestFocus()
         } else {
-            AltaPersona().altaPersona(fileToUpload, correuAct, passAct, nameAct)
+            AltaPersona().altaPersona(fileToUpload, emailStr, passwordStr, nameStr)
         }
     }
 
@@ -150,8 +150,7 @@ class RegisterActivity : AppCompatActivity() {
             println("SQL CLASS ERROR: " + e.message)
         }
 
-       val intent = Intent(this, GalleryActivity::class.java)
-       intent.putExtra("correu", correuAct)
+       val intent = Intent(this, LoginActivity::class.java)
        startActivity(intent)
     }
 }

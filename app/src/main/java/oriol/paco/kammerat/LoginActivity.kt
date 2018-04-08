@@ -132,7 +132,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         } else if (!isEmailValid(emailStr)) {
             email.error = getString(R.string.error_invalid_email)
             focusView = email
-            cancel = true
+            cancel = true 
         }
 
         if (cancel) {
