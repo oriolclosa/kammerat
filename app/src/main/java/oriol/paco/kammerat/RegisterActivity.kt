@@ -10,6 +10,9 @@ import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import java.sql.DriverManager
 import java.sql.SQLException
+import android.os.StrictMode
+
+
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -63,8 +66,8 @@ class RegisterActivity : AppCompatActivity() {
         nameRegister.error = null
         passwordRegister.error = null
         correuAct = emailRegister.text.toString()
-        passAct = nameRegister.text.toString()
-        nameAct = passwordRegister.text.toString()
+        passAct = passwordRegister.text.toString()
+        nameAct = nameRegister.text.toString()
         AltaPersona().altaPersona(fileToUpload, correuAct, passAct, nameAct)
     }
 
@@ -72,12 +75,16 @@ class RegisterActivity : AppCompatActivity() {
         println("DONO D'ALTA: " + persona)
         println("INSERT INTO users VALUES ('$correu', md5('$pass'), '$nom', '$persona');")
         try {
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+
             Class.forName("org.postgresql.Driver")
             val conn = DriverManager.getConnection(
                     "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
             val stsql = "INSERT INTO users VALUES ('$correu', md5('$pass'), '$nom', '$persona');"
             val st = conn.createStatement()
-            st.executeQuery(stsql)
+            val rs = st.executeQuery(stsql)
+            rs.next()
             conn.close()
         } catch (se: SQLException) {
             println("SQL ERROR: " + se.toString())
