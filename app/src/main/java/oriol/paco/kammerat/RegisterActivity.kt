@@ -10,6 +10,8 @@ import kotlinx.android.synthetic.main.activity_gallery.*
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import java.io.File
+import java.sql.DriverManager
+import java.sql.SQLException
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -65,6 +67,21 @@ class RegisterActivity : AppCompatActivity() {
 
     fun ferAlta(persona: String){
         println("DONO D'ALTA: " + persona)
+        try {
+            Class.forName("org.postgresql.Driver")
+            val conn = DriverManager.getConnection(
+                    "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('${passwordReg.text.toString()}'), ${nameReg.text.toString()}, '$persona');"
+            val st = conn.createStatement()
+            val rs = st.executeQuery(stsql)
+            rs.next()
+            conn.close()
+        } catch (se: SQLException) {
+            println("SQL ERROR: " + se.toString())
+        } catch (e: ClassNotFoundException) {
+            println("SQL CLASS ERROR: " + e.message)
+        }
+
         val intent = Intent(this, GalleryActivity::class.java)
         intent.putExtra("correu", correuAct)
         startActivity(intent)
