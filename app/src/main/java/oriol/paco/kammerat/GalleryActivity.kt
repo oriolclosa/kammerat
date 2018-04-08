@@ -30,6 +30,7 @@ import java.lang.Thread.sleep
 
 class GalleryActivity : AppCompatActivity() {
     lateinit var fileToUpload:File
+    lateinit var filePath:Uri
 
     lateinit var correu:String
 
@@ -40,7 +41,7 @@ class GalleryActivity : AppCompatActivity() {
         correu = intent.getStringExtra("correu")
 
         pickImage.setOnClickListener { mostrarImatges() }
-        sendImage.setOnClickListener { penjarImatge() }
+        sendImage.setOnClickListener { obtenirIDs() }
     }
 
     private fun mostrarImatges(){
@@ -55,13 +56,13 @@ class GalleryActivity : AppCompatActivity() {
             0 -> if (resultCode == Activity.RESULT_OK) {
                 val selectedImage = imageReturnedIntent.data
                 imagePicked.setImageURI(selectedImage)
-                Azure().send(getRealPathFromURI(selectedImage))
+                filePath = selectedImage
                 fileToUpload = File(getRealPathFromURI(selectedImage))
             }
             1 -> if (resultCode == Activity.RESULT_OK) {
                 val selectedImage = imageReturnedIntent.data
                 imagePicked.setImageURI(selectedImage)
-                Azure().send(getRealPathFromURI(selectedImage))
+                filePath = selectedImage
                 fileToUpload = File(getRealPathFromURI(selectedImage))
             }
         }
@@ -81,13 +82,16 @@ class GalleryActivity : AppCompatActivity() {
         return result
     }
 
-    fun ferMatch(list: ArrayList<String>){
-        println(list.toString())
+    private fun obtenirIDs(){
+        Azure().send(getRealPathFromURI(filePath))
     }
 
-    private fun penjarImatge(){
-        println("HOLAAAA")
+    fun ferMatch(list: ArrayList<String>){
+        Identificacio().identificacio(list)
+    }
 
+
+    private fun penjarImatge(list: ArrayList<String>){
         val credentialsProvider = BasicAWSCredentials("AKIAI3HUO3V33FAMWBSQ", "qvmkUQEqKkCTkVzs1tKHFzu5qezFMn4FcxfrwGe2")
 
         /*val credentialsProvider = CognitoCachingCredentialsProvider(
