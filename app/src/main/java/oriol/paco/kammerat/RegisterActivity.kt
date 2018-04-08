@@ -14,15 +14,15 @@ import java.sql.SQLException
 class RegisterActivity : AppCompatActivity() {
 
     lateinit var fileToUpload: String
-     var correuAct: String? = null
-    var passAct: String? = null
-     var nameAct: String? = null
+    lateinit var correuAct: String
+    lateinit var passAct: String
+    lateinit var nameAct: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        submitButton.setOnClickListener { setAndAlta() }
+        submitButton.setOnClickListener { crearPersona() }
         takeButton.setOnClickListener { mostrarImatges() }
     }
 
@@ -59,30 +59,22 @@ class RegisterActivity : AppCompatActivity() {
         }
         return result
     }
-
-    fun setAndAlta(){
+    fun crearPersona(){
         nameRegister.error = null
         passwordRegister.error = null
         correuAct = emailRegister.text.toString()
         passAct = nameRegister.text.toString()
         nameAct = passwordRegister.text.toString()
-        crearPersona()
+        AltaPersona().altaPersona(fileToUpload, correuAct, passAct, nameAct)
     }
 
-    fun crearPersona(){
-        AltaPersona().altaPersona(fileToUpload, correuAct!!)
-    }
-
-    fun ferAlta(persona: String){
+    fun ferAlta(persona: String, correu: String, pass: String, nom: String){
         println("DONO D'ALTA: " + persona)
-        println("A: " + correuAct)
-        println("B: " + passAct)
-        println("C: " + nameAct)
         try {
             Class.forName("org.postgresql.Driver")
             val conn = DriverManager.getConnection(
                     "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-            val stsql = "INSERT INTO users VALUES ('$correuAct', md5('$passAct'), '$nameAct', '$persona');"
+            val stsql = "INSERT INTO users VALUES ('$correu', md5('$pass'), '$nom', '$persona');"
             val st = conn.createStatement()
             st.executeQuery(stsql)
             conn.close()
