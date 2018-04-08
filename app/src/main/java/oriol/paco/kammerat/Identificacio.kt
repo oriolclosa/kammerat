@@ -33,6 +33,7 @@ class Identificacio {
                     val data = result.get()
                     println("La identificacio ha anat be")
                     println(data)
+                    GalleryActivity().penjarImatge(data)
                 }
             }
         }

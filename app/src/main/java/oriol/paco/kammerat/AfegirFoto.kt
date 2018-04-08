@@ -10,21 +10,16 @@ import java.util.regex.Pattern
 
 class AfegirFoto {
     fun afegirFoto(uri : String, idPersona : String) {
-        val endpoint =
-                "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/" +
-                        Constants.GROUP_ID + "/persons/$idPersona/persistedFaces"
+        val endpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/${Constants.GROUP_ID}/persons/${idPersona}/persistedFaces"
+
+
         println("miro $endpoint")
         FuelManager.instance.baseHeaders = mapOf(
                 "Content-Type" to "application/octet-stream",
                 "Ocp-Apim-Subscription-Key" to Constants.KEY
         )
 
-        FuelManager.instance.baseParams = listOf(
-                "returnFaceId" to "true",
-                "returnFaceRectangle" to "false",
-                "returnFaceLandmarks" to "true",
-                "returnFaceAttributes" to "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise"
-        )
+        FuelManager.instance.baseParams = listOf()
         val file = File(uri)
         val size = file.length()
         val bytes = ByteArray(size.toInt())
@@ -52,6 +47,7 @@ class AfegirFoto {
                 }
                 is Result.Success -> {
                     val data = result.get()
+                    // TODO: quitar comillas
                     val p = Pattern.compile("(\"[^\"]{36}\")")
                     val m = p.matcher(data)
                     while (m.find()) {
