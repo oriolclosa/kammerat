@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.activity_gallery.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Environment
 import android.os.StrictMode
 import android.support.v4.app.ActivityCompat
 import android.util.JsonReader
@@ -159,6 +160,41 @@ class GalleryActivity : AppCompatActivity() {
 
     fun baixarImatge(path: String){
         println("PATH: " + path)
+
+
+        val credentialsProvider = BasicAWSCredentials("AKIAI3HUO3V33FAMWBSQ", "qvmkUQEqKkCTkVzs1tKHFzu5qezFMn4FcxfrwGe2")
+
+        val s3Client = AmazonS3Client(credentialsProvider)
+        val transferUtility = TransferUtility.builder()
+                .context(applicationContext)
+                .awsConfiguration(AWSMobileClient.getInstance().configuration)
+                .s3Client(s3Client)
+                .build()
+
+        val fitxer = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+"test.jpg")
+
+        val downloadObserver = transferUtility.download("testoriol", path, fitxer)
+
+        downloadObserver.setTransferListener(object : TransferListener {
+
+            override fun onStateChanged(id: Int, state: TransferState) {
+                if (TransferState.COMPLETED == state) {
+                    Toast.makeText(applicationContext, "Image received!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
+                val percentDone = percentDonef.toInt()
+
+                println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
+            }
+
+            override fun onError(id: Int, ex: Exception) {
+                ex.printStackTrace()
+            }
+
+        })
     }
 
     fun obtenirImatges(){
@@ -170,24 +206,21 @@ class GalleryActivity : AppCompatActivity() {
             val stsql = "SELECT * FROM images WHERE (faceid = '$faceid');"
             val st = conn.createStatement()
             val rs = st.executeQuery(stsql)
-            while(rs.next()) {
-                val resultat = rs.getString(1)
-                baixarImatge(resultat)
-                try {
-                    Class.forName("org.postgresql.Driver")
-                    val conn = DriverManager.getConnection(
-                            "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-                    val stsql = "DELETE FROM images WHERE (id == '$resultat') and (faceid = '$faceid');"
-                    val st = conn.createStatement()
-                    val rs = st.executeQuery(stsql)
-                    rs.next()
-                    val resultat2 = rs.getString(1)
-                    conn.close()
-                } catch (se: SQLException) {
-                    println("SQL ERROR: " + se.toString())
-                } catch (e: ClassNotFoundException) {
-                    println("SQL CLASS ERROR: " + e.message)
-                }
+            rs.next()
+            val resultat = rs.getString(1)
+            baixarImatge(resultat)
+            try {
+                Class.forName("org.postgresql.Driver")
+                val conn2 = DriverManager.getConnection(
+                        "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+                val stsql2 = "DELETE FROM images WHERE (id = '$resultat') and (faceid = '$faceid');"
+                val st2 = conn2.createStatement()
+                st2.executeQuery(stsql2)
+                conn2.close()
+            } catch (se2: SQLException) {
+                println("SQL ERROR2: " + se2.toString())
+            } catch (e2: ClassNotFoundException) {
+                println("SQL CLASS ERROR2: " + e2.message)
             }
             conn.close()
         } catch (se: SQLException) {
