@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 class Azure {
     private val endpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect"
 
-    fun send(uri: String) {
+    fun send(uri: String, correu: String, imatge: String) {
         FuelManager.instance.baseHeaders = mapOf(
                 "Content-Type" to "application/octet-stream",
                 "Ocp-Apim-Subscription-Key" to Constants.KEY
@@ -57,13 +57,13 @@ class Azure {
 
                         llista.add(x.toString())
                     }
-                    enviarListaAGallery(llista);
+                    enviarListaAGallery(llista, correu, imatge)
                 }
             }
         }
     }
 
-    fun enviarListaAGallery(list : ArrayList<String> ) {
-        GalleryActivity().ferMatch(list)
+    fun enviarListaAGallery(list : ArrayList<String>, correu: String, imatge: String) {
+        GalleryActivity().ferMatch(list, correu, imatge)
     }
 }

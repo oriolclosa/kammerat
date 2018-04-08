@@ -12,7 +12,9 @@ import kotlinx.android.synthetic.main.activity_gallery.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.StrictMode
 import android.support.v4.app.ActivityCompat
+import android.util.JsonReader
 import android.widget.*
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
@@ -22,9 +24,21 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Klaxon
+import com.beust.klaxon.Parser
+import com.github.kittinunf.fuel.android.core.Json
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.reflect.TypeToken
+import org.json.JSONArray
+import org.json.JSONObject
 import org.postgresql.core.Utils
 import java.io.File
 import java.lang.Thread.sleep
+import java.sql.DriverManager
+import java.sql.SQLException
 import java.util.*
 
 
@@ -33,27 +47,30 @@ class GalleryActivity : AppCompatActivity() {
     lateinit var filePath:Uri
 
     lateinit var correu:String
+    lateinit var faceid:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
         correu = intent.getStringExtra("correu")
+        faceid = intent.getStringExtra("faceid")
 
         temporitzador()
 
         pickImage.setOnClickListener { mostrarImatges() }
         sendImage.setOnClickListener { obtenirIDs() }
+        fetchImages.setOnClickListener{ obtenirImatges() }
     }
 
     private fun temporitzador() {
         val myTimer = Timer()
         myTimer.schedule(object : TimerTask() {
             override fun run() {
-                println("holita")
+                println("HOLITA")
             }
 
-        }, 0, 1000)
+        }, 0, 5000)
     }
 
     private fun mostrarImatges(){
@@ -95,15 +112,6 @@ class GalleryActivity : AppCompatActivity() {
     }
 
     private fun obtenirIDs(){
-        Azure().send(getRealPathFromURI(filePath))
-    }
-
-    fun ferMatch(list: ArrayList<String>){
-        Identificacio().identificacio(list)
-    }
-
-
-    fun penjarImatge(list: ArrayList<String>){
         val credentialsProvider = BasicAWSCredentials("AKIAI3HUO3V33FAMWBSQ", "qvmkUQEqKkCTkVzs1tKHFzu5qezFMn4FcxfrwGe2")
 
         /*val credentialsProvider = CognitoCachingCredentialsProvider(
@@ -119,33 +127,102 @@ class GalleryActivity : AppCompatActivity() {
                 .s3Client(s3Client)
                 .build()
 
-        val iterator = list.iterator()
-        if(iterator.hasNext()) {
-            iterator.next()
+        val uploadObserver = transferUtility.upload("testoriol", correu + "/" + fileToUpload.name, fileToUpload)
+
+        uploadObserver.setTransferListener(object : TransferListener {
+
+            override fun onStateChanged(id: Int, state: TransferState) {
+                if (TransferState.COMPLETED == state) {
+                    Toast.makeText(applicationContext, "Image sent!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
+                val percentDone = percentDonef.toInt()
+
+                println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
+            }
+
+            override fun onError(id: Int, ex: Exception) {
+                ex.printStackTrace()
+            }
+
+        })
+
+        Azure().send(getRealPathFromURI(filePath), correu, fileToUpload.name)
+    }
+
+    fun ferMatch(list: ArrayList<String>, correu3: String, imatge2: String){
+        Identificacio().identificacio(list, correu3, imatge2)
+    }
+
+    fun baixarImatge(path: String){
+        println("PATH: " + path)
+    }
+
+    fun obtenirImatges(){
+        println("FACE: " + faceid)
+        try {
+            Class.forName("org.postgresql.Driver")
+            val conn = DriverManager.getConnection(
+                    "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+            val stsql = "SELECT * FROM images WHERE (faceid = '$faceid');"
+            val st = conn.createStatement()
+            val rs = st.executeQuery(stsql)
+            while(rs.next()) {
+                val resultat = rs.getString(1)
+                baixarImatge(resultat)
+                try {
+                    Class.forName("org.postgresql.Driver")
+                    val conn = DriverManager.getConnection(
+                            "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+                    val stsql = "DELETE FROM images WHERE (id == '$resultat') and (faceid = '$faceid');"
+                    val st = conn.createStatement()
+                    val rs = st.executeQuery(stsql)
+                    rs.next()
+                    val resultat2 = rs.getString(1)
+                    conn.close()
+                } catch (se: SQLException) {
+                    println("SQL ERROR: " + se.toString())
+                } catch (e: ClassNotFoundException) {
+                    println("SQL CLASS ERROR: " + e.message)
+                }
+            }
+            conn.close()
+        } catch (se: SQLException) {
+            println("SQL ERROR: " + se.toString())
+        } catch (e: ClassNotFoundException) {
+            println("SQL CLASS ERROR: " + e.message)
         }
-        iterator.forEach {
-            val uploadObserver = transferUtility.upload("testoriol", it + "/" + fileToUpload.name, fileToUpload)
+    }
 
-            uploadObserver.setTransferListener(object : TransferListener {
+    fun penjarImatge(list: JSONArray, correu2: String, imatge2: String){
+        val path = "$correu2/$imatge2"
 
-                override fun onStateChanged(id: Int, state: TransferState) {
-                    if (TransferState.COMPLETED == state) {
-                        Toast.makeText(applicationContext, "Image sent!", Toast.LENGTH_SHORT).show()
-                    }
+        for(i in 0..(list.length()-1)){
+            val act = list.getJSONObject(i)
+            for(j in 0..(act.length()-2)){
+                val act2 = act.getJSONArray("candidates").getJSONObject(j).get("personId")
+                println(act2.toString())
+                try {
+                    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+                    StrictMode.setThreadPolicy(policy)
+
+                    Class.forName("org.postgresql.Driver")
+                    val conn = DriverManager.getConnection(
+                            "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+                    val stsql = "INSERT INTO images VALUES ('$path', '$act2');"
+                    val st = conn.createStatement()
+                    val rs = st.executeQuery(stsql)
+                    rs.next()
+                    conn.close()
+                } catch (se: SQLException) {
+                    println("SQL ERROR: " + se.toString())
+                } catch (e: ClassNotFoundException) {
+                    println("SQL CLASS ERROR: " + e.message)
                 }
-
-                override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                    val percentDonef = bytesCurrent.toFloat() / bytesTotal.toFloat() * 100
-                    val percentDone = percentDonef.toInt()
-
-                    println("ID:$id|bytesCurrent: $bytesCurrent|bytesTotal: $bytesTotal|$percentDone%")
-                }
-
-                override fun onError(id: Int, ex: Exception) {
-                    ex.printStackTrace()
-                }
-
-            })
+            }
         }
     }
 

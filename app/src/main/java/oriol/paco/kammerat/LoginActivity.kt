@@ -23,6 +23,7 @@ import android.widget.TextView
 
 import android.Manifest.permission.READ_CONTACTS
 import android.content.Intent
+import android.os.StrictMode
 
 import kotlinx.android.synthetic.main.activity_login.*
 import java.sql.DriverManager
@@ -54,8 +55,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
         email_sign_in_button.setOnClickListener { attemptLogin() }
         registerButton.setOnClickListener { obrirRegister() }
-
-        //obrirGaleria()
     }
 
 
@@ -244,8 +243,32 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     }
 
     private fun obrirGaleria(correu: String){
+        var resultat = ""
+        val correuAux = email.text
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        try {
+            Class.forName("org.postgresql.Driver")
+            val conn = DriverManager.getConnection(
+                    "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+            val stsql = "SELECT * FROM users WHERE (id = '$correuAux');"
+            val st = conn.createStatement()
+            val rs = st.executeQuery(stsql)
+            rs.next()
+            resultat = rs.getString(4)
+            conn.close()
+        } catch (se: SQLException) {
+            println("SQL ERROR: " + se.toString())
+        } catch (e: ClassNotFoundException) {
+            println("SQL CLASS ERROR: " + e.message)
+        }
+
+        println("CORREU: " + email.text)
+        println("FACEID: " + resultat)
+
         val intent = Intent(this, GalleryActivity::class.java)
         intent.putExtra("correu", correu)
+        intent.putExtra("faceid", resultat)
         startActivity(intent)
     }
 

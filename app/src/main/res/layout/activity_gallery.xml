@@ -33,6 +33,13 @@
             android:layout_marginBottom="16dp"
             android:text="Send image" />
 
+        <Button
+            android:id="@+id/fetchImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Fetch images" />
+
         <ImageView
             android:id="@+id/imagePicked"
             android:layout_width="match_parent"
