@@ -27,7 +27,12 @@ class AltaPersona {
                     val p = Pattern.compile("(\"[^\"]{36}\")")
                     val m = p.matcher(data)
                     m.find()
-                    val personID = m.group().toString()
+                    var personID = m.group().toString()
+                    val x : StringBuilder = StringBuilder(personID)
+                    x.deleteCharAt(0)
+                    x.deleteCharAt(x.length - 1)
+                    personID = x.toString()
+
                     RegisterActivity().ferAlta(personID, correuP, pass, nom)
                     AfegirFoto().afegirFoto(uriBase, personID)
                 }

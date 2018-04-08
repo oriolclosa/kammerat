@@ -70,6 +70,7 @@ class RegisterActivity : AppCompatActivity() {
 
     fun ferAlta(persona: String, correu: String, pass: String, nom: String){
         println("DONO D'ALTA: " + persona)
+        println("INSERT INTO users VALUES ('$correu', md5('$pass'), '$nom', '$persona');")
         try {
             Class.forName("org.postgresql.Driver")
             val conn = DriverManager.getConnection(
@@ -84,8 +85,8 @@ class RegisterActivity : AppCompatActivity() {
             println("SQL CLASS ERROR: " + e.message)
         }
 
-        /*val intent = Intent(this, GalleryActivity::class.java)
-        intent.putExtra("correu", correuAct)
-        startActivity(intent)*/
+       // val intent = Intent(this, GalleryActivity::class.java)
+       // intent.putExtra("correu", correuAct)
+       // startActivity(intent)
     }
 }

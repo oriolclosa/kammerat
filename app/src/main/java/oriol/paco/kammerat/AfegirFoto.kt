@@ -13,6 +13,7 @@ class AfegirFoto {
         val endpoint =
                 "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/persongroups/" +
                         Constants.GROUP_ID + "/persons/$idPersona/persistedFaces"
+        println("miro $endpoint")
         FuelManager.instance.baseHeaders = mapOf(
                 "Content-Type" to "application/octet-stream",
                 "Ocp-Apim-Subscription-Key" to Constants.KEY
@@ -28,15 +29,15 @@ class AfegirFoto {
         val size = file.length()
         val bytes = ByteArray(size.toInt())
         try {
-            println("Hola $uri")
+            println("puedo leer bien $uri en afegir foto")
             val buf = BufferedInputStream(FileInputStream(file))
             buf.read(bytes, 0, bytes.size)
             buf.close()
         } catch (e: Exception) {
-            println("Fitxer no trobat")
+            println("Fitxer no trobat en afegir foto")
         }
 
-        println("Començant a enviar imatge")
+        println("Començant a enviar afegir foto")
         val llista = ArrayList<String>()
 
 
@@ -47,6 +48,7 @@ class AfegirFoto {
             when (result) {
                 is Result.Failure -> {
                     println(result.getException())
+                    println("ha petat afegir foto")
                 }
                 is Result.Success -> {
                     val data = result.get()
@@ -55,6 +57,7 @@ class AfegirFoto {
                     while (m.find()) {
                         llista.add(m.group().toString())
                     }
+                    println("afegir foto tot be")
                     Train().train()
                 }
             }

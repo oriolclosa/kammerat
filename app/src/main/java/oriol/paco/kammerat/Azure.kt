@@ -52,7 +52,11 @@ class Azure {
                     val p = Pattern.compile("(\"[^\"]{36}\")")
                     val m = p.matcher(data)
                     while (m.find()) {
-                        llista.add(m.group().toString())
+                        val item = m.group().toString()
+                        val x : StringBuilder = StringBuilder(item)
+                        x.deleteCharAt(0)
+                        x.deleteCharAt(x.length - 1)
+                        llista.add(x.toString())
                     }
                     enviarListaAGallery(llista);
                 }
