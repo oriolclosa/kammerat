@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import java.sql.DriverManager
 import java.sql.SQLException
 import java.util.*
-import java.sql.*;
+import java.util.regex.Pattern
 
 /**
  * A login screen that offers login via email/password.
@@ -150,13 +150,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     }
 
     private fun isEmailValid(email: String): Boolean {
-        //TODO: Replace this with your own logic
-        return email.contains("@")
+        val pat = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\." +
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$")
+        return pat.matcher(email).matches()
     }
 
+
     private fun isPasswordValid(password: String): Boolean {
-        //TODO: Replace this with your own logic
-        return password.length > 4
+        return password.length > 5
     }
 
     /**
@@ -243,13 +246,13 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         val IS_PRIMARY = 1
     }
 
-    private fun obrirGaleria(correu: String){
+    private fun obrirGaleria(correu: String) {
         val intent = Intent(this, GalleryActivity::class.java)
         intent.putExtra("correu", correu)
         startActivity(intent)
     }
 
-    private fun obrirRegister(){
+    private fun obrirRegister() {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
     }
@@ -271,7 +274,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 val rs = st.executeQuery(stsql)
                 rs.next()
                 val resultat = rs.getString(1)
-                if(resultat == mEmail){
+                if (resultat == mEmail) {
                     correcte = true
                 }
                 conn.close()
