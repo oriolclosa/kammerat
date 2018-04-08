@@ -171,7 +171,7 @@ class GalleryActivity : AppCompatActivity() {
                 .s3Client(s3Client)
                 .build()
 
-        val fitxer = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+path)
+        val fitxer = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS+"/"+path)
 
         val downloadObserver = transferUtility.download("testoriol", path, fitxer)
 
@@ -235,25 +235,28 @@ class GalleryActivity : AppCompatActivity() {
 
         for(i in 0..(list.length()-1)){
             val act = list.getJSONObject(i)
-            for(j in 0..(act.length()-2)){
-                val act2 = act.getJSONArray("candidates").getJSONObject(j).get("personId")
-                println(act2.toString())
-                try {
-                    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-                    StrictMode.setThreadPolicy(policy)
+            if(act.length()>1) {
+                for (j in 0..(act.length() - 2)) {
+                    println(act)
+                    val act2 = act.getJSONArray("candidates").getJSONObject(j).get("personId")
+                    println(act2.toString())
+                    try {
+                        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+                        StrictMode.setThreadPolicy(policy)
 
-                    Class.forName("org.postgresql.Driver")
-                    val conn = DriverManager.getConnection(
-                            "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
-                    val stsql = "INSERT INTO images VALUES ('$path', '$act2');"
-                    val st = conn.createStatement()
-                    val rs = st.executeQuery(stsql)
-                    rs.next()
-                    conn.close()
-                } catch (se: SQLException) {
-                    println("SQL ERROR: " + se.toString())
-                } catch (e: ClassNotFoundException) {
-                    println("SQL CLASS ERROR: " + e.message)
+                        Class.forName("org.postgresql.Driver")
+                        val conn = DriverManager.getConnection(
+                                "jdbc:postgresql://kammerat.cybqc7ksnnjo.eu-west-1.rds.amazonaws.com:5432/users", "root", "2018CopeRDS!")
+                        val stsql = "INSERT INTO images VALUES ('$path', '$act2');"
+                        val st = conn.createStatement()
+                        val rs = st.executeQuery(stsql)
+                        rs.next()
+                        conn.close()
+                    } catch (se: SQLException) {
+                        println("SQL ERROR: " + se.toString())
+                    } catch (e: ClassNotFoundException) {
+                        println("SQL CLASS ERROR: " + e.message)
+                    }
                 }
             }
         }
