@@ -13,14 +13,23 @@ class Identificacio {
                 "Ocp-Apim-Subscription-Key" to Constants.KEY
         )
 
+        val list2 = ArrayList < String > ()
+        for (i in 0 until list.size)
+        {
+            list2.add("\"" + list[i] + "\"")
+        }
+
+
         val contingut = """
         {
             "personGroupId": "${Constants.GROUP_ID}",
-            "faceIds": $list,
+            "faceIds": $list2,
             "maxNumOfCandidatesReturned": 1,
             "confidenceThreshold": 0.5
         }
         """
+
+        println(contingut)
 
         endpoint.httpPost().body(contingut).responseString { request, response, result ->
             //do something with response
