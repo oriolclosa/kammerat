@@ -31,9 +31,13 @@ import java.lang.Thread.sleep
 class GalleryActivity : AppCompatActivity() {
     lateinit var fileToUpload:File
 
+    lateinit var correu:String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
+
+        correu = intent.getStringExtra("correu")
 
         pickImage.setOnClickListener { mostrarImatges() }
         sendImage.setOnClickListener { penjarImatge() }
@@ -99,13 +103,13 @@ class GalleryActivity : AppCompatActivity() {
                 .s3Client(s3Client)
                 .build()
 
-        val uploadObserver = transferUtility.upload("testoriol", "testupload/" + fileToUpload.name, fileToUpload)
+        val uploadObserver = transferUtility.upload("testoriol", correu + "/" + fileToUpload.name, fileToUpload)
 
         uploadObserver.setTransferListener(object : TransferListener {
 
             override fun onStateChanged(id: Int, state: TransferState) {
                 if (TransferState.COMPLETED == state) {
-                    Toast.makeText(applicationContext, "Upload Completed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Image sent!", Toast.LENGTH_SHORT).show()
                 }
             }
 

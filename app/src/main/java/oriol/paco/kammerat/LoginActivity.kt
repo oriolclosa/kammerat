@@ -53,8 +53,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         })
 
         email_sign_in_button.setOnClickListener { attemptLogin() }
+        registerButton.setOnClickListener { obrirRegister() }
 
-        obrirGaleria()
+        //obrirGaleria()
     }
 
     private fun populateAutoComplete() {
@@ -241,8 +242,14 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         val IS_PRIMARY = 1
     }
 
-    private fun obrirGaleria(){
+    private fun obrirGaleria(correu: String){
         val intent = Intent(this, GalleryActivity::class.java)
+        intent.putExtra("correu", correu)
+        startActivity(intent)
+    }
+
+    private fun obrirRegister(){
+        val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
     }
 
@@ -281,7 +288,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
-                obrirGaleria()
+                obrirGaleria(mEmail)
             } else {
                 password.error = getString(R.string.error_incorrect_password)
                 password.requestFocus()

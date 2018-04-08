@@ -21,16 +21,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="100dp"
-        android:layout_height="75dp"
-        app:srcCompat="@drawable/denmark" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="16dp" />
-
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -41,6 +31,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                app:srcCompat="@drawable/denmark" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -105,4 +105,5 @@
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>
